@@ -1,0 +1,26 @@
+.board {
+    display: grid;
+    gap: 10px;
+    /* Pendiente */
+    grid-template-columns: repeat(4, 100px);
+}
+  
+.card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    /* Pendiente */
+    border-radius: 8px;
+    border-width: 4px;
+    border-color: aqua;
+    width: 100px;
+    height: 150px;
+    font-size: 50px;
+    background-color: rgb(1, 145, 123);
+}
+  
+.card.flipped, .card.matched {
+    background-color: rgb(13, 57, 122);
+    color: white;
+}
