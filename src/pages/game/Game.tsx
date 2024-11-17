@@ -1,49 +1,38 @@
 import { useState, useEffect, useCallback } from 'react'
 
-import { Card, Player } from '../../utils/DataTypes'
+import { CardType, PlayerType } from '../../utils/DataTypes'
+
+import { generateCardsFoods, shuffleArray } from '../../config/cards'
+import { createPlayers } from '../../config/players'
+
+import { Card } from '../../components/card/Card'
+import { Board } from '../../components/board/Board'
+import { Player } from '../../components/player/Player'
+import { Button } from '../../components/button/Button'
+import { RadioButton } from '../../components/radioButton/RadioButton'
 
 import styles from './Game.module.css'
 
-const initialCards: Card[] = [
-    { id: 1, name: '1', flipped: false, matched: false },
-    { id: 2, name: '1', flipped: false, matched: false },
-    { id: 3, name: '2', flipped: false, matched: false },
-    { id: 4, name: '2', flipped: false, matched: false },
-    { id: 5, name: '3', flipped: false, matched: false },
-    { id: 6, name: '3', flipped: false, matched: false },
-    { id: 7, name: '4', flipped: false, matched: false },
-    { id: 8, name: '4', flipped: false, matched: false },
-    { id: 9, name: '5', flipped: false, matched: false },
-    { id: 10, name: '5', flipped: false, matched: false },
-    { id: 11, name: '6', flipped: false, matched: false },
-    { id: 12, name: '6', flipped: false, matched: false },
-    { id: 13, name: '7', flipped: false, matched: false },
-    { id: 14, name: '7', flipped: false, matched: false },
-    { id: 15, name: '8', flipped: false, matched: false },
-    { id: 16, name: '8', flipped: false, matched: false },
-]
+const numberOfPairs = 8
+const numberOfPlayers = 2
 
-const initialPlayers: Player[] = [
-    { id: 1, name: 'Player 1', score: 0 },
-    { id: 2, name: 'Player 2', score: 0 },
-]
-
-const shuffleArray = (array: Card[]): Card[] => {
-    return array.sort(() => Math.random() - 0.5)
-}
+const initialCards = generateCardsFoods(numberOfPairs)
+const initialPlayers = createPlayers(numberOfPlayers)
 
 const Game = () => {
     /*
         Estados del juego
             1. Cartas
             2. Cartas seleccionadas
+            3. Cartas habilitadas
             3. Jugadores
             4. Jugador actual en el turno
             5. Ganador
     */
-    const [ cards, setCards ] = useState<Card[]>(shuffleArray([...initialCards]))
+    const [ cards, setCards ] = useState<CardType[]>(shuffleArray([...initialCards]))
     const [ selectedCards, setSelectedCards ] = useState<number[]>([])
-    const [ players, setPlayers ] = useState<Player[]>(initialPlayers)
+    const [ isDisabled, setIsDisabled ] = useState<boolean>(false)
+    const [ players, setPlayers ] = useState<PlayerType[]>(initialPlayers)
     const [ currentPlayer, setCurrentPlayer ] = useState<number>(0)
     const [ winner, setWinner ] = useState<string | null>(null)
 
@@ -54,12 +43,13 @@ const Game = () => {
             3. Asigna la cantidad de cartas que han sido seleccionadas
     */
     const handleCardClick = (index: number) => {
-        if (selectedCards.length < 2 && !cards[index].flipped) {
-            const newCards = [...cards]
-            newCards[index].flipped = true
-            setCards(newCards)
-            setSelectedCards((prev) => [...prev, index])
-        }
+        if (isDisabled || selectedCards.length >= 2 || cards[index].flipped) return null
+
+        const newCards = [...cards]
+        newCards[index].flipped = true
+        setCards(newCards)
+
+        setSelectedCards((prev) => [...prev, index])
     }
 
     /*
@@ -107,58 +97,125 @@ const Game = () => {
     */
     useEffect(() => {
         if (selectedCards.length === 2) {
+            setIsDisabled(true)
             const [ first, second ] = selectedCards
             if (cards[first].name === cards[second].name) {
+                // Aumenta el marcador del Jugador el cual hizo un match en las cartas
                 setPlayers((prev) => 
                     prev.map((player, index) => (
                         index === currentPlayer ? { ...player, score: player.score + 1 } : player
                     ))
                 )
-                setCards((prev) => 
-                    prev.map((card, index) => (
-                        index === first || index === second ? { ...card, matched: true } : card
-                    ))
-                )
+                setTimeout(() => {matchCards(first, second)}, 1000)
+                setIsDisabled(false)
             } else {
-                setTimeout(() => flipBackCards(first, second), 1000)
-                switchTurn()
+                setTimeout(() => { 
+                    flipBackCards(first, second)
+                    switchTurn()
+                    setIsDisabled(false)
+                }, 1000)
             }
             setSelectedCards([])
         }
         checkForWinner();
     }, [selectedCards, cards, currentPlayer, switchTurn, checkForWinner])
 
+    const restartGame = () => {
+        // Restablece el estado de las cartas (por ejemplo, las volteas todas para empezar de nuevo)
+        const shuffledCards = shuffleArray(generateCardsFoods(numberOfPairs));
+        setCards(shuffledCards);
+        
+        // Reinicia las cartas seleccionadas
+        setSelectedCards([]);
+        
+        // Vuelve a habilitar las cartas
+        setIsDisabled(false);
+        
+        // Si tienes jugadores, reinicia sus puntajes y selecciona al primer jugador
+        setPlayers(players.map(player => ({ ...player, score: 0 })));
+        setCurrentPlayer(0);
+
+        // Si tienes jugadores ganadores, reinicia el ganador
+        setWinner(null)
+    };
+
+    // Cambia el estado de las cartas las cuales le hicieron Match
+    const matchCards = (first: number, second: number) => {
+        setCards((prev) => 
+            prev.map((card, index) => (
+                index === first || index === second ? { ...card, matched: true } : card
+            ))
+        )
+        
+    }
+
     return (
-        <div className="memoryGame">
-            {/* Turn or Winner */}
-            { winner ? (
-                <div className="winner"> <h2>¡{winner} ha ganado!</h2> </div>
-                ) : (
-                <h2>Turno de: {players[currentPlayer].name}</h2>
-            )}
+        <>
+            {/* Turn or Winner / Score of game */}
+            <div className={styles["scores"]}>
+                {players.map((player) => (
+                    <Player key={player.id} player={player} isActive={players[currentPlayer].name === player.name} isWinner={winner === player.name}/>
+                ))}
+            </div>
             {/* Cards of game */}
-            <div className={styles.board}>
-                { cards.map((card, index) => (
-                    <button
-                        key={card.id}
-                        onClick={() => handleCardClick(index)}
-                        disabled={card.flipped || card.matched}
-                        // Pendiente
-                        className={`${styles.card} ${card.flipped ? styles.flipped : ""} ${card.matched ? styles.matched : ""}`}
-                    >
-                        {card.flipped || card.matched ? card.name : '⚜️'}
-                    </button>
-                ))}
+            <div className={styles["memoryGame"]}>
+                <Board> 
+                    { cards.map((card, index) => ( 
+                        <Card card={card} index={index} handleCardClick={handleCardClick} key={card.id}/> 
+                    ))} 
+                </Board>
             </div>
-            {/* Score of game */}
-            <div className="scores">
-                { players.map((player) => (
-                    <div key={player.id}>
-                        {player.name}: {player.score} puntos
+            {/* Footer */}
+            <div className={styles["footer"]}>
+                <div style={{width: '50%', alignItems: 'center', justifyContent: 'center', display: 'flex'}}>
+                    <Button label='Reiniciar Juego' name='restart' key='restartButton' onClick={() => { restartGame() }}></Button>
+                </div>
+                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', width: '50%'}}>
+                    <div style={{alignItems: 'left', justifyContent: 'left', display: 'flex', flexDirection: 'column', padding: '1rem', border: 'solid', borderRadius: '8px'}}>
+                        <h4 style={{textAlign:'center', marginTop: '6px', marginBottom: '6px'}}>Cantidad de Cartas:</h4>
+                        <RadioButton options={
+                            [
+                                { label: '8', value: 'cards8' },
+                                { label: '16', value: 'cards16' },
+                                { label: '24', value: 'cards24' },
+                                { label: '32', value: 'cards32' },
+                                { label: '40', value: 'cards40' },
+                            ]
+                        }></RadioButton>
+                        <h4 style={{textAlign:'center', marginTop: '6px', marginBottom: '6px'}}>Cantidad de Jugadores:</h4>
+                        <RadioButton options={
+                            [
+                                { label: '1', value: 'player1' },
+                                { label: '2', value: 'player2' },
+                                { label: '3', value: 'player3' },
+                                { label: '4', value: 'player4' },
+                                { label: '5', value: 'player5' },
+                                { label: '6', value: 'player6' },
+                            ]
+                        }></RadioButton>
+                        <h4 style={{textAlign:'center', marginTop: '6px', marginBottom: '6px'}}>Tipo de Cartas:</h4>
+                        <RadioButton options={
+                            [
+                                { label: 'Frutas', value: 'cardsFruits' },
+                                { label: 'Números', value: 'cardsNumbers' },
+                                { label: 'Emojis', value: 'cardsEmojis' },
+                                { label: 'Objetos', value: 'cardsObjects' },
+                            ]
+                        }></RadioButton>
+                        <h4 style={{textAlign:'center', marginTop: '6px', marginBottom: '6px'}}>Diseño del Juego:</h4>
+                        <RadioButton options={
+                            [
+                                { label: 'Negro', value: 'gameBlack' },
+                                { label: 'Azul', value: 'gameBlue' },
+                                { label: 'Verde', value: 'gameGreen' },
+                                { label: 'Rojo', value: 'gameRed' },
+                                { label: 'Rosado', value: 'gamePink' },
+                            ]
+                        }></RadioButton>
                     </div>
-                ))}
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 

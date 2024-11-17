@@ -15,11 +15,9 @@
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  justify-content: center;
-  min-width: 100vh;
-  min-height: 100vh;
+  display: block; 
+  width: 100vw;
+  height: 100vh;
 }
 
 @media (prefers-color-scheme: light) {

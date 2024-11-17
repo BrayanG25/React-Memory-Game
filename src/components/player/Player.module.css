@@ -1,0 +1,80 @@
+.playerCard {
+    /* Content Setting */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    /* Style Settings */
+    background-color: #e0e0e0;
+    color: #333;
+    cursor: pointer;
+    border-radius: 12px;
+    border: 2px solid #333;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    /* Dimension Settings */
+    height: 50px;
+    width: 100px;
+    /* Animate Settings */
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.playerCard:hover {
+    /* Animate Settings */
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.playerCard.active {
+    /* Color Settings */
+    background-color: #4CAF50; /* Color de turno */
+    border-color: #2e7d32;
+}
+
+.playerCard.winner {
+    /* Color Settings */
+    background-color: #FFD700; /* Color de ganador */
+    border-color: #FF8C00;
+}
+
+.playerName {
+    font-weight: bold;
+    color: #111;
+    /* Style Settings */
+    font-size: 0.75rem;
+    margin-bottom: 2px;
+}
+
+.playerScore {
+    font-weight: bolder;
+    color: #111;
+    /* Style Settings */
+    font-size: 1rem;
+}
+
+/* sm - md */
+@media (min-width: 640px) {
+    .playerCard {
+        height: 60px;
+        width: 100px;
+    }
+    .playerName {
+        font-size: 0.75rem;
+    }
+    .playerScore {
+        font-size: 1rem;
+    }
+}
+
+/* lg - xl - 2xl  */
+@media (min-width: 1024px) {
+    .playerCard {
+        height: 80px;
+        width: 150px;
+    }
+    .playerName {
+        font-size: 1.2rem;
+    }
+    .playerScore {
+        font-size: 1.5rem;
+    }
+}

@@ -1,26 +1,29 @@
-.board {
-    display: grid;
-    gap: 10px;
-    /* Pendiente */
-    grid-template-columns: repeat(4, 100px);
-}
-  
-.card {
+/* Score Settings */
+.scores {
     display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Memory Game Settings */
+.memoryGame {
+    width: 90%;
+    max-width: 90%;
+    padding: 1rem;
+    margin: 1rem auto;
+    box-sizing: border-box;
+    background-color: rgb(79, 79, 79);
+    border-radius: 8px;
+}
+
+/* Footer Settings */
+.footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    /* Pendiente */
-    border-radius: 8px;
-    border-width: 4px;
-    border-color: aqua;
-    width: 100px;
-    height: 150px;
-    font-size: 50px;
-    background-color: rgb(1, 145, 123);
-}
-  
-.card.flipped, .card.matched {
-    background-color: rgb(13, 57, 122);
-    color: white;
+    flex-direction: column;
 }

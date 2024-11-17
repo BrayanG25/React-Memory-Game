@@ -1,0 +1,31 @@
+.radio-button-container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 0.25rem;
+    justify-content: center;
+}
+  
+.radio-button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: solid;
+    background-color: white;
+    color: #4b5563;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    cursor: pointer;
+}
+  
+.radio-button:hover {
+    background-color: #f3f4f6;
+}
+  
+.radio-button.selected {
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+  
+.radio-button.unselected {
+    border-color: #e5e7eb;
+} 

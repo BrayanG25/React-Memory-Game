@@ -1,11 +1,11 @@
-export interface Card {
+export interface CardType {
     id: number;
     name: string;
     flipped: boolean;
     matched: boolean;
 }
 
-export interface Player {
+export interface PlayerType {
     id: number;
     name: string;
     score: number;
