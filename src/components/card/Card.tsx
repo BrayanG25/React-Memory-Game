@@ -6,9 +6,10 @@ interface CardProps {
     card: CardType;
     index: number;
     handleCardClick: (index: number) => void;
+    typeColor: string;
 }
 
-export const Card = ({ card, index, handleCardClick }: CardProps) => {
+export const Card = ({ card, index, handleCardClick, typeColor }: CardProps) => {
     return (
         <button
             onClick={() => handleCardClick(index)}
@@ -16,7 +17,7 @@ export const Card = ({ card, index, handleCardClick }: CardProps) => {
             className={`${styles["card"]} ${card.flipped && styles["flipped"] } ${card.matched && styles["matched"] }`}
         >
             <div className={styles["card-inner"]}>
-                <div className={styles["card-front"]}>💎</div>
+            <div className={`${styles["card-front"]} ${styles[typeColor]}`}>💎</div>
                 <div className={styles["card-back"]}>{card.name}</div>
             </div>
         </button>

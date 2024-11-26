@@ -9,6 +9,8 @@ interface Option {
 
 interface Props {
   options: Option[];
+  defaultValue?: string;
+  onChange?: (value: string) => void;
 }
 
 const defaultOptions = [
@@ -17,11 +19,16 @@ const defaultOptions = [
   { label: 'Opción 3', value: 'option3' },
 ]
 
-export const RadioButton = ({ options = defaultOptions }: Props) => {
-  const [selected, setSelected] = useState(options[0].value)
+export const RadioButton = ({ options = defaultOptions, defaultValue, onChange }: Props) => {
+  const [selected, setSelected] = useState(defaultValue ?? options[0]?.value)
 
   const handleSelect = (value: string) => {
     setSelected(value)
+    if (onChange) onChange(value)
+  }
+
+  if (!options || options.length === 0) {
+    throw new Error("The 'options' prop must be a non-empty array.");
   }
 
   return (

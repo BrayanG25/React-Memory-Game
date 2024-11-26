@@ -1,8 +1,8 @@
 .card {
     /* Dimension Settings */
     position: relative;
-    width: 70px;
-    height: 100px;
+    width: 90px;
+    height: 135px;
     /* Content Settings */
     cursor: pointer;
     padding: 0%;
@@ -59,7 +59,7 @@
     justify-content: center;
     border-radius: 8px;
     /* Text Settings */
-    font-size: 45px;
+    font-size: 70px;
     font-weight: bold;
     color: white;
     /* Volley Settings */
@@ -69,11 +69,11 @@
 /* sm */
 @media (min-width: 428px) {
     .card {
-        width: 70px;
-        height: 100px;
+        width: 90px;
+        height: 135px;
     }
     .card-front, .card-back {
-        font-size: 45px;
+        font-size: 70px;
     }
 }
 
@@ -102,6 +102,31 @@
 .card-front {
     /* Color Settings Front */
     background-color: rgb(17, 2, 132);
+}
+
+.card-front-black {
+    /* Color Settings Front */
+    background-color: rgb(39, 39, 39);
+}
+
+.card-front-blue {
+    /* Color Settings Front */
+    background-color: rgb(17, 2, 132);
+}
+
+.card-front-green {
+    /* Color Settings Front */
+    background-color: rgb(0, 91, 17);
+}
+
+.card-front-red {
+    /* Color Settings Front */
+    background-color: rgb(130, 7, 7);
+}
+
+.card-front-pink {
+    /* Color Settings Front */
+    background-color: rgb(120, 2, 104);
 }
 
 .card-back {

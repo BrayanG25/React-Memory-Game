@@ -3,17 +3,17 @@
     align-items: center;
     justify-content: center;
     place-content: center;
-    grid-template-columns: repeat(auto-fill, 70px);
-    gap: 2px;
+    grid-template-columns: repeat(auto-fill, 90px);
+    gap: 1px;
     padding: 2px;
 }
 
 /* sm Settings */
 @media (min-width: 428px) {
     .board {
-        grid-template-columns: repeat(auto-fill, 70px);
-        gap: 8px;
-        padding: 8px;
+        grid-template-columns: repeat(auto-fill, 90px);
+        gap: 1px;
+        padding: 2px;
     }
 }
 

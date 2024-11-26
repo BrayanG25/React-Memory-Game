@@ -11,7 +11,7 @@
 .memoryGame {
     width: 90%;
     max-width: 90%;
-    padding: 1rem;
+    padding: 0rem;
     margin: 1rem auto;
     box-sizing: border-box;
     background-color: rgb(79, 79, 79);
@@ -26,4 +26,28 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+}
+
+/* sm Settings */
+@media (min-width: 428px) {
+    .memoryGame {
+        max-width: 90%;
+        padding: 0rem;
+    }
+}
+
+/* md Settings */
+@media (min-width: 768px) {
+    .memoryGame {
+        max-width: 90%;
+        padding: 1rem;
+    }
+}
+
+/* lg - xl - 2xl */
+@media (min-width: 1024px) {
+    .memoryGame {
+        max-width: 90%;
+        padding: 1rem;
+    }
 }

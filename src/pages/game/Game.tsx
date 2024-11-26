@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 
 import { CardType, PlayerType } from '../../utils/DataTypes'
 
-import { generateCardsFoods, shuffleArray } from '../../config/cards'
+import { cardTypeHandler } from '../../config/cards'
 import { createPlayers } from '../../config/players'
 
 import { Card } from '../../components/card/Card'
@@ -13,28 +13,39 @@ import { RadioButton } from '../../components/radioButton/RadioButton'
 
 import styles from './Game.module.css'
 
-const numberOfPairs = 8
-const numberOfPlayers = 2
-
-const initialCards = generateCardsFoods(numberOfPairs)
-const initialPlayers = createPlayers(numberOfPlayers)
-
 const Game = () => {
     /*
+        Configuracion
+            1. Cantidad de cartas
+            2. Cantidad de jugadores
+            3. Tipos de cartas
         Estados del juego
             1. Cartas
             2. Cartas seleccionadas
             3. Cartas habilitadas
-            3. Jugadores
-            4. Jugador actual en el turno
-            5. Ganador
-    */
-    const [ cards, setCards ] = useState<CardType[]>(shuffleArray([...initialCards]))
-    const [ selectedCards, setSelectedCards ] = useState<number[]>([])
-    const [ isDisabled, setIsDisabled ] = useState<boolean>(false)
-    const [ players, setPlayers ] = useState<PlayerType[]>(initialPlayers)
-    const [ currentPlayer, setCurrentPlayer ] = useState<number>(0)
-    const [ winner, setWinner ] = useState<string | null>(null)
+            4. Jugadores
+            5. Jugador actual en el turno
+            6. Ganador
+    */   
+   const [ numberOfPairs, setNumberOfPairs ] = useState<number>(4)
+   const [ numberOfPlayers, setNumberOfPlayers ] = useState<number>(1)
+   const [ typeCards, setTypeCards ] = useState<string>('cardsFruits')
+   const [ typeColor, setTypeColor] = useState<string>("card-front")
+
+   useEffect(() => {
+        setCards(cardTypeHandler(typeCards, numberOfPairs))
+    }, [numberOfPairs, typeCards])
+
+    useEffect(() => {
+        setPlayers(createPlayers(numberOfPlayers))
+    }, [numberOfPlayers])
+
+   const [ cards, setCards ] = useState<CardType[]>(cardTypeHandler(typeCards, numberOfPairs))
+   const [ selectedCards, setSelectedCards ] = useState<number[]>([])
+   const [ isDisabled, setIsDisabled ] = useState<boolean>(false)
+   const [ players, setPlayers ] = useState<PlayerType[]>(createPlayers(numberOfPlayers))
+   const [ currentPlayer, setCurrentPlayer ] = useState<number>(0)
+   const [ winner, setWinner ] = useState<string | null>(null)
 
     /*
         Manejar el click sobre la carta
@@ -82,7 +93,7 @@ const Game = () => {
             )
             setWinner(winningPlayer.name)
         }
-    }, [cards, players]);
+    }, [cards, players])
 
     /*
         Manejar las acciones
@@ -117,27 +128,27 @@ const Game = () => {
             }
             setSelectedCards([])
         }
-        checkForWinner();
+        checkForWinner()
     }, [selectedCards, cards, currentPlayer, switchTurn, checkForWinner])
 
     const restartGame = () => {
         // Restablece el estado de las cartas (por ejemplo, las volteas todas para empezar de nuevo)
-        const shuffledCards = shuffleArray(generateCardsFoods(numberOfPairs));
-        setCards(shuffledCards);
+        const shuffledCards = cardTypeHandler(typeCards, numberOfPairs)
+        setCards(shuffledCards)
         
         // Reinicia las cartas seleccionadas
-        setSelectedCards([]);
+        setSelectedCards([])
         
         // Vuelve a habilitar las cartas
-        setIsDisabled(false);
+        setIsDisabled(false)
         
         // Si tienes jugadores, reinicia sus puntajes y selecciona al primer jugador
-        setPlayers(players.map(player => ({ ...player, score: 0 })));
-        setCurrentPlayer(0);
+        setPlayers(players.map(player => ({ ...player, score: 0 })))
+        setCurrentPlayer(0)
 
         // Si tienes jugadores ganadores, reinicia el ganador
         setWinner(null)
-    };
+    }
 
     // Cambia el estado de las cartas las cuales le hicieron Match
     const matchCards = (first: number, second: number) => {
@@ -146,7 +157,67 @@ const Game = () => {
                 index === first || index === second ? { ...card, matched: true } : card
             ))
         )
-        
+    }
+
+    // Escucha la seleccion de la cantidad de cartas
+    const handleOptionChangeCards = (value: string) => {
+        try {
+            const numberOfCards = parseInt(value.replace('cards', ''), 10)
+            if (isNaN(numberOfCards)) throw new Error("Invalid option value cards")
+            setNumberOfPairs(numberOfCards/2)
+            console.log(`Game configured with ${numberOfCards} cards.`)
+
+        } catch (error) {
+            console.error("Failed to update game configuration number of cards:", error)
+        }
+    }
+
+    // Escucha la seleccion de la cantidad de jugadores
+    const handleOptionChangePlayers = (value: string) => {
+        try {
+            const numberOfPlayers = parseInt(value.replace('players', ''), 10)
+            if (isNaN(numberOfPlayers)) throw new Error("Invalid option value players")
+            setNumberOfPlayers(numberOfPlayers)
+            console.log(`Game configured with ${numberOfPlayers} players.`)
+
+        } catch (error) {
+            console.error("Failed to update game configuration number of players:", error)
+        }
+    }
+
+    // Escucha la seleccion del tipo de cartas
+    const handleOptionChangeTypeCards = (value: string) => {
+        try {
+            if(typeof value !== 'string' || value.trim() === '') throw new Error("Invalid option value type cards")
+            setTypeCards(value)
+            console.log(`Game configured with ${value}.`)
+
+        } catch (error) {
+            console.error("Failed to update game configuration type of cards:", error)
+        }
+    }
+
+    // Escucha la seleccion del tipo de color de juego
+    const handleOptionChangeTypeColor = (color: string) => {
+        switch (color) {
+            case 'gameBlack':
+                setTypeColor("card-front-black")
+                break
+            case 'gameBlue':
+                setTypeColor("card-front-blue")
+                break
+            case 'gameGreen':
+                setTypeColor("card-front-green")
+                break
+            case 'gameRed':
+                setTypeColor("card-front-red")
+                break
+            case 'gamePink':
+                setTypeColor("card-front-pink")
+                break
+            default:
+                setTypeColor("card-front")
+        }
     }
 
     return (
@@ -161,7 +232,7 @@ const Game = () => {
             <div className={styles["memoryGame"]}>
                 <Board> 
                     { cards.map((card, index) => ( 
-                        <Card card={card} index={index} handleCardClick={handleCardClick} key={card.id}/> 
+                        <Card card={card} index={index} handleCardClick={handleCardClick} key={card.id} typeColor={typeColor}/> 
                     ))} 
                 </Board>
             </div>
@@ -173,45 +244,53 @@ const Game = () => {
                 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', width: '50%'}}>
                     <div style={{alignItems: 'left', justifyContent: 'left', display: 'flex', flexDirection: 'column', padding: '1rem', border: 'solid', borderRadius: '8px'}}>
                         <h4 style={{textAlign:'center', marginTop: '6px', marginBottom: '6px'}}>Cantidad de Cartas:</h4>
-                        <RadioButton options={
-                            [
+                        <RadioButton 
+                            options={[
                                 { label: '8', value: 'cards8' },
                                 { label: '16', value: 'cards16' },
                                 { label: '24', value: 'cards24' },
                                 { label: '32', value: 'cards32' },
                                 { label: '40', value: 'cards40' },
-                            ]
-                        }></RadioButton>
+                            ]}
+                            defaultValue="cards8"
+                            onChange={handleOptionChangeCards}
+                            ></RadioButton>
                         <h4 style={{textAlign:'center', marginTop: '6px', marginBottom: '6px'}}>Cantidad de Jugadores:</h4>
-                        <RadioButton options={
-                            [
-                                { label: '1', value: 'player1' },
-                                { label: '2', value: 'player2' },
-                                { label: '3', value: 'player3' },
-                                { label: '4', value: 'player4' },
-                                { label: '5', value: 'player5' },
-                                { label: '6', value: 'player6' },
-                            ]
-                        }></RadioButton>
+                        <RadioButton 
+                            options={[
+                                { label: '1', value: 'players1' },
+                                { label: '2', value: 'players2' },
+                                { label: '3', value: 'players3' },
+                                { label: '4', value: 'players4' },
+                                { label: '5', value: 'players5' },
+                                { label: '6', value: 'players6' },
+                            ]}
+                            defaultValue="players1"
+                            onChange={handleOptionChangePlayers}
+                        ></RadioButton>
                         <h4 style={{textAlign:'center', marginTop: '6px', marginBottom: '6px'}}>Tipo de Cartas:</h4>
-                        <RadioButton options={
-                            [
+                        <RadioButton 
+                        options={[
                                 { label: 'Frutas', value: 'cardsFruits' },
                                 { label: 'Números', value: 'cardsNumbers' },
                                 { label: 'Emojis', value: 'cardsEmojis' },
                                 { label: 'Objetos', value: 'cardsObjects' },
-                            ]
-                        }></RadioButton>
+                            ]}
+                            defaultValue="cardsFruits"
+                            onChange={handleOptionChangeTypeCards}
+                        ></RadioButton>
                         <h4 style={{textAlign:'center', marginTop: '6px', marginBottom: '6px'}}>Diseño del Juego:</h4>
-                        <RadioButton options={
-                            [
+                        <RadioButton 
+                        options={[
                                 { label: 'Negro', value: 'gameBlack' },
                                 { label: 'Azul', value: 'gameBlue' },
                                 { label: 'Verde', value: 'gameGreen' },
                                 { label: 'Rojo', value: 'gameRed' },
                                 { label: 'Rosado', value: 'gamePink' },
-                            ]
-                        }></RadioButton>
+                            ]}
+                            defaultValue="gameBlue"
+                            onChange={handleOptionChangeTypeColor}
+                        ></RadioButton>
                     </div>
                 </div>
             </div>
