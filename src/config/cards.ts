@@ -10,7 +10,8 @@ const generateCardsFoods = (numPairs: number): CardType[] => {
         do {
             emoji = foods[Math.floor(Math.random() * foods.length)]
         } while (usedFoods.has(emoji))
-            usedFoods.add(emoji)
+        
+        usedFoods.add(emoji)
 
         cards.push({ id: i * 2 + 1, name: emoji, flipped: false, matched: false })
         cards.push({ id: i * 2 + 2, name: emoji, flipped: false, matched: false })
@@ -40,6 +41,7 @@ const generateCardsEmojis = (numPairs: number): CardType[] => {
         do {
             emoji = emojis[Math.floor(Math.random() * emojis.length)]
         } while (usedEmojis.has(emoji))
+
         usedEmojis.add(emoji)
 
         cards.push({ id: i * 2 + 1, name: emoji, flipped: false, matched: false })
@@ -59,7 +61,8 @@ const generateCardsObjects = (numPairs: number): CardType[] => {
         do {
             emoji = objects[Math.floor(Math.random() * objects.length)]
         } while (usedObjects.has(emoji))
-            usedObjects.add(emoji)
+
+        usedObjects.add(emoji)
 
         cards.push({ id: i * 2 + 1, name: emoji, flipped: false, matched: false })
         cards.push({ id: i * 2 + 2, name: emoji, flipped: false, matched: false })
@@ -86,7 +89,7 @@ export const cardTypeHandler = (cardType: string, numPairs: number) => {
             return shuffleArray(generateCardsNumbers(numPairs))
         case 'cardsemojis':
             return shuffleArray(generateCardsEmojis(numPairs))
-        case 'cardspbjects':
+        case 'cardsobjects':
             return shuffleArray(generateCardsObjects(numPairs))
         default:
             return shuffleArray(generateCardsFoods(numPairs))

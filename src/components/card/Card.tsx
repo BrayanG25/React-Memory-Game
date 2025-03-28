@@ -7,9 +7,10 @@ interface CardProps {
     index: number;
     handleCardClick: (index: number) => void;
     typeColor: string;
+    columns: number;
 }
 
-export const Card = ({ card, index, handleCardClick, typeColor }: CardProps) => {
+export const Card = ({ card, index, handleCardClick, typeColor, columns }: CardProps) => {
     return (
         <button
             onClick={() => handleCardClick(index)}
@@ -17,8 +18,24 @@ export const Card = ({ card, index, handleCardClick, typeColor }: CardProps) => 
             className={`${styles["card"]} ${card.flipped && styles["flipped"] } ${card.matched && styles["matched"] }`}
         >
             <div className={styles["card-inner"]}>
-            <div className={`${styles["card-front"]} ${styles[typeColor]}`}>💎</div>
-                <div className={styles["card-back"]}>{card.name}</div>
+            <div 
+                className={`${styles["card-front"]} ${styles[typeColor]}`} 
+                style={{
+                    fontSize: columns === 4 ? '70px' : '40px',
+                    ...(columns > 0 ? {} : { fontSize: '80px' })
+                }}
+            >
+                💎
+            </div>
+                <div 
+                    className={styles["card-back"]}
+                    style={{
+                        fontSize: columns === 4 ? '70px' : '40px',
+                        ...(columns > 0 ? {} : { fontSize: '80px' })
+                    }}
+                >
+                    {card.name}
+                </div>
             </div>
         </button>
     )

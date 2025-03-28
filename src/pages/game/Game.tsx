@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 import { CardType, PlayerType } from '../../utils/DataTypes'
 
@@ -11,6 +11,11 @@ import { Player } from '../../components/player/Player'
 import { Button } from '../../components/button/Button'
 import { RadioButton } from '../../components/radioButton/RadioButton'
 
+import { PlaySoundCard } from '../../components/sound/CardSound'
+import { PlaySoundError } from '../../components/sound/ErrorSound'
+import { PlaySoundPoint } from '../../components/sound/PointSound'
+// import { PlaySoundWin } from '../../components/sound/WinSound'
+
 import styles from './Game.module.css'
 
 const Game = () => {
@@ -19,6 +24,7 @@ const Game = () => {
             1. Cantidad de cartas
             2. Cantidad de jugadores
             3. Tipos de cartas
+            4. Tipo de Color
         Estados del juego
             1. Cartas
             2. Cartas seleccionadas
@@ -26,32 +32,53 @@ const Game = () => {
             4. Jugadores
             5. Jugador actual en el turno
             6. Ganador
+        Variables de ajuste de visualización
+            1. Tamaño del dispositivo
     */   
-   const [ numberOfPairs, setNumberOfPairs ] = useState<number>(4)
-   const [ numberOfPlayers, setNumberOfPlayers ] = useState<number>(1)
-   const [ typeCards, setTypeCards ] = useState<string>('cardsFruits')
-   const [ typeColor, setTypeColor] = useState<string>("card-front")
+    const [ numberOfPairs, setNumberOfPairs ] = useState<number>(4)
+    const [ numberOfPlayers, setNumberOfPlayers ] = useState<number>(1)
+    const [ typeCards, setTypeCards ] = useState<string>('cardsFruits')
+    const [ typeColor, setTypeColor] = useState<string>("card-front")
 
-   useEffect(() => {
+    const [ cards, setCards ] = useState<CardType[]>(cardTypeHandler(typeCards, numberOfPairs))
+    const [ selectedCards, setSelectedCards ] = useState<number[]>([])
+    const [ isDisabled, setIsDisabled ] = useState<boolean>(false)
+    const [ players, setPlayers ] = useState<PlayerType[]>(createPlayers(numberOfPlayers))
+    const [ currentPlayer, setCurrentPlayer ] = useState<number>(0)
+    const [ winner, setWinner ] = useState<string | null>(null)
+
+    const soundRefCard = useRef<{ playAudio: () => void }>(null)  
+    const soundRefError = useRef<{ playAudio: () => void }>(null)  
+    const soundRefPoint = useRef<{ playAudio: () => void }>(null)  
+
+    const [smallDevice, setSmallDevice] = useState(false)
+    const [columns, setColumns] = useState(4)
+
+    useEffect(() => {
         setCards(cardTypeHandler(typeCards, numberOfPairs))
-    }, [numberOfPairs, typeCards])
+
+        if (smallDevice) {
+            const columnMapping = {
+                20: 6,
+                12: 6,
+                16: 6
+            };
+            
+            setColumns(columnMapping[numberOfPairs as keyof typeof columnMapping] || 4);
+        }
+
+    }, [numberOfPairs, smallDevice, typeCards])
 
     useEffect(() => {
         setPlayers(createPlayers(numberOfPlayers))
     }, [numberOfPlayers])
 
-   const [ cards, setCards ] = useState<CardType[]>(cardTypeHandler(typeCards, numberOfPairs))
-   const [ selectedCards, setSelectedCards ] = useState<number[]>([])
-   const [ isDisabled, setIsDisabled ] = useState<boolean>(false)
-   const [ players, setPlayers ] = useState<PlayerType[]>(createPlayers(numberOfPlayers))
-   const [ currentPlayer, setCurrentPlayer ] = useState<number>(0)
-   const [ winner, setWinner ] = useState<string | null>(null)
-
     /*
         Manejar el click sobre la carta
             1. Marca la carta como volteada
             2. Asigna el estado global de todas las cartas del tablero
-            3. Asigna la cantidad de cartas que han sido seleccionadas
+            3. Emite el sonido de voltear la carta
+            4. Asigna la cantidad de cartas que han sido seleccionadas
     */
     const handleCardClick = (index: number) => {
         if (isDisabled || selectedCards.length >= 2 || cards[index].flipped) return null
@@ -61,6 +88,8 @@ const Game = () => {
         setCards(newCards)
 
         setSelectedCards((prev) => [...prev, index])
+
+        if (soundRefCard.current) soundRefCard.current.playAudio()
     }
 
     /*
@@ -117,9 +146,13 @@ const Game = () => {
                         index === currentPlayer ? { ...player, score: player.score + 1 } : player
                     ))
                 )
+
+                setTimeout(() => { if (soundRefPoint.current) soundRefPoint.current.playAudio() }, 500)
                 setTimeout(() => {matchCards(first, second)}, 1000)
                 setIsDisabled(false)
             } else {
+                setTimeout(() => { if (soundRefError.current) soundRefError.current.playAudio() }, 500)
+                    
                 setTimeout(() => { 
                     flipBackCards(first, second)
                     switchTurn()
@@ -220,29 +253,71 @@ const Game = () => {
         }
     }
 
+    // Valida el ancho del dispositivo para asignar el número de columnas
+    useEffect(() => {
+        const handleResize = () => {            
+            if (window.innerWidth <= 428) {
+                setSmallDevice(true)
+            } else {
+                setSmallDevice(false)
+            }
+        };
+
+        handleResize();
+        window.addEventListener("resize", handleResize);
+
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     return (
         <>
+            <PlaySoundCard ref={soundRefCard} />
+            <PlaySoundError ref={soundRefError} />
+            <PlaySoundPoint ref={soundRefPoint} />
             {/* Turn or Winner / Score of game */}
             <div className={styles["scores"]}>
                 {players.map((player) => (
-                    <Player key={player.id} player={player} isActive={players[currentPlayer].name === player.name} isWinner={winner === player.name}/>
+                    <Player 
+                        key={player.id} 
+                        player={player} 
+                        isActive={players[currentPlayer].name === player.name} 
+                        isWinner={winner === player.name}
+                    />
                 ))}
             </div>
             {/* Cards of game */}
             <div className={styles["memoryGame"]}>
-                <Board> 
+                <Board columns={ smallDevice ? columns : 0 }>
                     { cards.map((card, index) => ( 
-                        <Card card={card} index={index} handleCardClick={handleCardClick} key={card.id} typeColor={typeColor}/> 
+                        <Card key={card.id} index={index} card={card} handleCardClick={handleCardClick} typeColor={typeColor} columns ={ smallDevice ? columns : 0 }/>
                     ))} 
                 </Board>
             </div>
             {/* Footer */}
             <div className={styles["footer"]}>
-                <div style={{width: '50%', alignItems: 'center', justifyContent: 'center', display: 'flex'}}>
+                <div style={{ 
+                    width: smallDevice ? '100%' : '50%', 
+                    display: 'flex',
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                }}>
                     <Button label='Reiniciar Juego' name='restart' key='restartButton' onClick={() => { restartGame() }}></Button>
                 </div>
-                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', width: '50%'}}>
-                    <div style={{alignItems: 'left', justifyContent: 'left', display: 'flex', flexDirection: 'column', padding: '1rem', border: 'solid', borderRadius: '8px'}}>
+                <div style={{
+                    width: smallDevice ? '100%' : '50%', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                }}>
+                    <div style={{
+                        alignItems: 'left', 
+                        justifyContent: 'left', 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        padding: '1rem', 
+                        border: 'solid', 
+                        borderRadius: '8px'
+                    }}>
                         <h4 style={{textAlign:'center', marginTop: '6px', marginBottom: '6px'}}>Cantidad de Cartas:</h4>
                         <RadioButton 
                             options={[
