@@ -1,0 +1,35 @@
+.footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.buttonContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fullWidth {
+    width: 90vw;
+}
+
+.halfWidth {
+    width: 50%;
+}
+
+.settingsContainer {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    border: solid;
+    border-radius: 8px;
+}
+
+h4 {
+    text-align: center;
+    margin: 6px 0;
+}

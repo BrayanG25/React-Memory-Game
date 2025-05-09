@@ -20,17 +20,12 @@ export const Card = ({ card, index, handleCardClick, typeColor, columns }: CardP
             <div className={styles["card-inner"]}>
             <div 
                 className={`${styles["card-front"]} ${styles[typeColor]}`} 
-                style={{
-                    fontSize: columns === 4 ? '70px' : '40px',
-                    ...(columns > 0 ? {} : { fontSize: '80px' })
-                }}
-            >
-                💎
-            </div>
+                style={{ fontSize: columns === 4 || columns === 5 ? '80px' : '50px', ...(columns > 0 ? {} : { fontSize: '80px' }) }}
+            >♦</div>
                 <div 
                     className={styles["card-back"]}
                     style={{
-                        fontSize: columns === 4 ? '70px' : '40px',
+                        fontSize: columns === 4 ? '80px' : '50px',
                         ...(columns > 0 ? {} : { fontSize: '80px' })
                     }}
                 >

@@ -1,5 +1,8 @@
 .board {
-    display: grid;
+    width: 85vw;
+    max-width: 85vw;
+    min-height: 10vh;
+    display: grid;  
     align-items: center;
     justify-content: center;
     grid-template-columns: repeat(auto-fill, 90px);
@@ -8,11 +11,12 @@
 }
 
 /* sm Settings */
-@media (min-width: 428px) {
+@media (max-width: 640px) {
     .board {
-        grid-template-columns: repeat(auto-fill, 90px);
-        gap: 1px;
-        padding: 1px;
+        width: 98vw;
+        max-width: 98vw;
+        min-height: 10vh;
+        padding: 0rem;
     }
 }
 

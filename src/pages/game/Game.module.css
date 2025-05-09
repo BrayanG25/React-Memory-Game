@@ -2,9 +2,9 @@
 .scores {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
     justify-content: center;
-    margin-top: 20px;
+    gap: 15px;
+    margin: auto auto;
 }
 
 /* Memory Game Settings */
@@ -29,11 +29,40 @@
 }
 
 /* sm Settings */
-@media (min-width: 428px) {
+@media (max-width: 640px) {
+    .scores {
+        width: 98vw;
+        margin-top: 0.5rem;
+        gap: 0.25rem;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* 1 Jugador - Ocupa el 98% del ancho */
+    .players-1 .playerCard {
+        width: 98vw;
+    }
+
+    /* 2 Jugadores - Ocupan 50% cada uno */
+    .players-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4px;
+        justify-content: center;
+    }
+
+    /* 3 o más jugadores - Se distribuyen en una grilla de 3 columnas */
+    .players-3, .players-4, .players-5, .players-6 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        justify-content: center;
+    }
+
     .memoryGame {
         width: 98%;
         max-width: 98%;
-        padding: 0rem;
+        background-color: transparent;
     }
 }
 

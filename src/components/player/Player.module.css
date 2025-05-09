@@ -20,7 +20,7 @@
 
 .playerCard:hover {
     /* Animate Settings */
-    transform: translateY(-10px);
+    transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -51,7 +51,22 @@
     font-size: 1rem;
 }
 
-/* sm - md */
+/* sm */
+@media (max-width: 640px) {
+    .playerCard {
+        height: 100%;
+        width: 100%;
+        border: 1px solid #333;
+    }
+    .playerName {
+        font-size: 1rem;
+    }
+    .playerScore {
+        font-size: 1.25rem;
+    }
+}
+
+/* md */
 @media (min-width: 640px) {
     .playerCard {
         height: 60px;

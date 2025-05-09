@@ -8,8 +8,7 @@ import { createPlayers } from '../../config/players'
 import { Card } from '../../components/card/Card'
 import { Board } from '../../components/board/Board'
 import { Player } from '../../components/player/Player'
-import { Button } from '../../components/button/Button'
-import { RadioButton } from '../../components/radioButton/RadioButton'
+import { Config } from '../../components/config/Config'
 
 import { PlaySoundCard } from '../../components/sound/CardSound'
 import { PlaySoundError } from '../../components/sound/ErrorSound'
@@ -60,7 +59,7 @@ const Game = () => {
         if (smallDevice) {
             const columnMapping = {
                 20: 6,
-                12: 6,
+                12: 5,
                 16: 6
             };
             
@@ -256,7 +255,7 @@ const Game = () => {
     // Valida el ancho del dispositivo para asignar el número de columnas
     useEffect(() => {
         const handleResize = () => {            
-            if (window.innerWidth <= 428) {
+            if (window.innerWidth <= 640) {
                 setSmallDevice(true)
             } else {
                 setSmallDevice(false)
@@ -275,7 +274,7 @@ const Game = () => {
             <PlaySoundError ref={soundRefError} />
             <PlaySoundPoint ref={soundRefPoint} />
             {/* Turn or Winner / Score of game */}
-            <div className={styles["scores"]}>
+            <div className={`${styles["scores"]} ${styles["players-"+players.length]}`}>
                 {players.map((player) => (
                     <Player 
                         key={player.id} 
@@ -294,81 +293,14 @@ const Game = () => {
                 </Board>
             </div>
             {/* Footer */}
-            <div className={styles["footer"]}>
-                <div style={{ 
-                    width: smallDevice ? '100%' : '50%', 
-                    display: 'flex',
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                }}>
-                    <Button label='Reiniciar Juego' name='restart' key='restartButton' onClick={() => { restartGame() }}></Button>
-                </div>
-                <div style={{
-                    width: smallDevice ? '100%' : '50%', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                }}>
-                    <div style={{
-                        alignItems: 'left', 
-                        justifyContent: 'left', 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        padding: '1rem', 
-                        border: 'solid', 
-                        borderRadius: '8px'
-                    }}>
-                        <h4 style={{textAlign:'center', marginTop: '6px', marginBottom: '6px'}}>Cantidad de Cartas:</h4>
-                        <RadioButton 
-                            options={[
-                                { label: '8', value: 'cards8' },
-                                { label: '16', value: 'cards16' },
-                                { label: '24', value: 'cards24' },
-                                { label: '32', value: 'cards32' },
-                                { label: '40', value: 'cards40' },
-                            ]}
-                            defaultValue="cards8"
-                            onChange={handleOptionChangeCards}
-                            ></RadioButton>
-                        <h4 style={{textAlign:'center', marginTop: '6px', marginBottom: '6px'}}>Cantidad de Jugadores:</h4>
-                        <RadioButton 
-                            options={[
-                                { label: '1', value: 'players1' },
-                                { label: '2', value: 'players2' },
-                                { label: '3', value: 'players3' },
-                                { label: '4', value: 'players4' },
-                                { label: '5', value: 'players5' },
-                                { label: '6', value: 'players6' },
-                            ]}
-                            defaultValue="players1"
-                            onChange={handleOptionChangePlayers}
-                        ></RadioButton>
-                        <h4 style={{textAlign:'center', marginTop: '6px', marginBottom: '6px'}}>Tipo de Cartas:</h4>
-                        <RadioButton 
-                        options={[
-                                { label: 'Frutas', value: 'cardsFruits' },
-                                { label: 'Números', value: 'cardsNumbers' },
-                                { label: 'Emojis', value: 'cardsEmojis' },
-                                { label: 'Objetos', value: 'cardsObjects' },
-                            ]}
-                            defaultValue="cardsFruits"
-                            onChange={handleOptionChangeTypeCards}
-                        ></RadioButton>
-                        <h4 style={{textAlign:'center', marginTop: '6px', marginBottom: '6px'}}>Diseño del Juego:</h4>
-                        <RadioButton 
-                        options={[
-                                { label: 'Negro', value: 'gameBlack' },
-                                { label: 'Azul', value: 'gameBlue' },
-                                { label: 'Verde', value: 'gameGreen' },
-                                { label: 'Rojo', value: 'gameRed' },
-                                { label: 'Rosado', value: 'gamePink' },
-                            ]}
-                            defaultValue="gameBlue"
-                            onChange={handleOptionChangeTypeColor}
-                        ></RadioButton>
-                    </div>
-                </div>
-            </div>
+            <Config 
+                handleOptionChangeCards={handleOptionChangeCards} 
+                handleOptionChangePlayers={handleOptionChangePlayers} 
+                handleOptionChangeTypeCards={handleOptionChangeTypeCards} 
+                handleOptionChangeTypeColor={handleOptionChangeTypeColor} 
+                restartGame={restartGame} 
+                smallDevice={smallDevice}
+            />
         </>
     )
 }
